@@ -37,7 +37,8 @@ def main():
                       help="ffmpeg library to use for audio encoding")
     args.add_argument("-b", "--abr", dest="abr", type=int, default=128,
                       help="Average desired audio bit-rate used for encoding, in kilobits per second")
-    args.add_argument("-t", "--threads", dest="threads", type=int, choices=range(1, 64), default=0)  # 0 => 'automatic'
+    args.add_argument("-t", "--threads", dest="threads", type=int, choices=range(1, 64), default=0,  # '0' => automatic
+                      help="Number of threads to use for encoding, by default automatic to CPU core count")
     args = args.parse_args()
 
 
