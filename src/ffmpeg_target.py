@@ -39,6 +39,8 @@ def main():
                       help="Average desired audio bit-rate used for encoding, in kilobits per second")
     args.add_argument("-t", "--threads", dest="threads", type=int, choices=range(1, 64), default=0,  # '0' => automatic
                       help="Number of threads to use for encoding, by default automatic to CPU core count")
+    args.add_argument("-y", "--yes", dest="yes", type=bool, action="store_true",
+                      help="Proxy for ffmpeg -y, confirming yes to file overwriting")
     args = args.parse_args()
 
 
