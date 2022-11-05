@@ -15,3 +15,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+
+"""
+TODO: See: https://trac.ffmpeg.org/wiki/Encode/H.264#twopass
+TODO: (200 MiB * 8388.608 [converts MiB to kBit; note: not 8192 as 1 kBit is always 1000 bit]) / 600 seconds = ~2796 kBit/s total bitrate
+TODO: 2796 - 128 kBit/s (desired audio bitrate) = 2668 kBit/s video bitrate
+
+TODO: Note 8388.608 appears to be a magic conversion number
+"""
