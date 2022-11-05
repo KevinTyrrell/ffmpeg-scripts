@@ -26,7 +26,6 @@ from os import cpu_count
 
 
 class ArgWash:
-
     def __init__(self, args: Namespace) -> None:
         """
         Constructs an Argument Washer, ensuring provided arguments are prepared for use
@@ -52,6 +51,10 @@ class ArgWash:
             ArgWash.__ThreadWasher(args, args.threads)
         ]:
             washer.wash()
+
+        # Copy elements to the washer
+        for k, v in args.__dict__.items():
+            setattr(self, k, v)
 
     class __ArgWasher:  # Interface
         def __init__(self, args: Namespace, value: Any):
@@ -92,7 +95,7 @@ class ArgWash:
             return "File size must be less than the input's file size"
 
         def _wash(self) -> bool:
-            return getsize(self._args.input) / 1048576 < self._value  # Convert Bytes -> MB
+            return getsize(self._args.input) / 1048576 > self._value  # Convert Bytes -> MB
 
     class __OutputWasher(__ArgWasher):
         def _get_exc(self) -> str:

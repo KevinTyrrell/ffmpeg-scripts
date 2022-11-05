@@ -20,6 +20,7 @@
 from argparse import ArgumentParser
 
 from arg_wash import ArgWash
+from ffmpeg_proxy import FFmpegProxy
 
 
 def main():
@@ -30,7 +31,7 @@ def main():
                                  "size. Ideal for uploaded media which must meet tight file size constraints.")
     # Required arguments
     args.add_argument("input", type=str, help="Absolute path to input media file to be re-encoded")
-    args.add_argument("file_size", type=int, help="Output file size target, in mega-bytes")
+    args.add_argument("file_size", type=float, help="Output file size target, in mega-bytes")
     args.add_argument("output", type=str, help="File name/absolute file path of re-encoded file, including extension")
     # Optional arguments
     args.add_argument("-l", "--lib", dest="lib", type=str, default="libx264",
@@ -46,6 +47,8 @@ def main():
     args = args.parse_args()
 
     wash = ArgWash(args)
+    proxy = FFmpegProxy(wash)
+    proxy.encode()
 
 
 if __name__ == '__main__':
