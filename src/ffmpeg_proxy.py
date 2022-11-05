@@ -21,6 +21,7 @@ from arg_wash import ArgWash
 import subprocess
 from distutils.spawn import find_executable
 from os import system
+from time import sleep
 
 
 class FFmpegProxy:
@@ -62,12 +63,14 @@ class FFmpegProxy:
         {7} => output audio average bitrate
         {8} => output file path
         """
-        fmt = "ffmpeg{0} {1}-i \"{2}\" -c:v {3} -b:v {4}k -pass 1 -an -f null /dev/null -preset {5} &&" \
+        fmt = "ffmpeg{0} {1}-i \"{2}\" -c:v {3} -b:v {4}k -pass 1 -vsync cfr -f null /dev/null -preset {5} &&" \
               " ffmpeg{0} -i \"{2}\" -c:v {3} -b:v {4}k -pass 2 -c:a {6} -b:a {7}k -preset {5} \"{8}\""
         cmd = fmt.format(
             " -threads " + str(self.__threads) if self.__threads > 1 else "",  # hide if threads=1
             "-y " if self.__yes else "", self.__input, self.__lib,
             self.__bitrate, self.__preset, self.__alib, self.__abr, self.__output)
+        print("\n", cmd, "\n")
+        sleep(0.1)  # ffmpeg output seems to prevent print from displaying
         system(cmd)  # start ffmpeg through a system call
 
     @staticmethod
