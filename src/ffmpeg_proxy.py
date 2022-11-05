@@ -37,10 +37,17 @@ class FFmpegProxy:
         self.__yes = args.yes
         self.__abr = args.abr
         self.__threads = args.threads
+        self.__preset = args.preset
         duration = FFmpegProxy.get_length(self.__input)
         self.__bitrate = FFmpegProxy.__calc_bitrate(args.file_size, duration, args.abr)
 
     def encode(self) -> None:
+        """
+        Performs a two-pass encoding and saves the encoded file to the storage medium
+
+        Encoding command is based on the formula provided in the FFmpeg docs:
+        https://trac.ffmpeg.org/wiki/Encode/H.264#twopass
+        """
         if not find_executable("ffmpeg"):
             raise ModuleNotFoundError("Dependency 'ffprobe' was not found in your system PATH")
 
@@ -50,16 +57,17 @@ class FFmpegProxy:
         {2} => input file path
         {3} => video encoding library
         {4} => output video average bitrate
-        {5} => audio encoding library
-        {6} => output audio average bitrate
-        {7} => output file path
+        {5} => encoding preset speed
+        {6} => audio encoding library
+        {7} => output audio average bitrate
+        {8} => output file path
         """
-        fmt = "ffmpeg{0} {1}-i \"{2}\" -c:v {3} -b:v {4}k -pass 1 -an -f null /dev/null &&" \
-              " ffmpeg{0} -i \"{2}\" -c:v {3} -b:v {4}k -pass 2 -c:a {5} -b:a {6}k \"{7}\""
+        fmt = "ffmpeg{0} {1}-i \"{2}\" -c:v {3} -b:v {4}k -pass 1 -an -f null /dev/null -preset {5} &&" \
+              " ffmpeg{0} -i \"{2}\" -c:v {3} -b:v {4}k -pass 2 -c:a {6} -b:a {7}k -preset {5} \"{8}\""
         cmd = fmt.format(
             " -threads " + str(self.__threads) if self.__threads > 1 else "",  # hide if threads=1
             "-y " if self.__yes else "", self.__input, self.__lib,
-            self.__bitrate, self.__alib, self.__abr, self.__output)
+            self.__bitrate, self.__preset, self.__alib, self.__abr, self.__output)
         system(cmd)  # start ffmpeg through a system call
 
     @staticmethod
@@ -94,12 +102,3 @@ class FFmpegProxy:
                                  "-of", "default=noprint_wrappers=1:nokey=1", file_path],
                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         return float(result.stdout)
-
-
-"""
-TODO: See: https://trac.ffmpeg.org/wiki/Encode/H.264#twopass
-TODO: (200 MiB * 8388.608 [converts MiB to kBit; note: not 8192 as 1 kBit is always 1000 bit]) / 600 seconds = ~2796 kBit/s total bitrate
-TODO: 2796 - 128 kBit/s (desired audio bitrate) = 2668 kBit/s video bitrate
-
-TODO: Note 8388.608 appears to be a magic conversion number
-"""
