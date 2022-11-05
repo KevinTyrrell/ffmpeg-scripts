@@ -36,6 +36,7 @@ class FFmpegProxy:
         self.__alib = args.alib
         self.__yes = args.yes
         self.__abr = args.abr
+        self.__threads = args.threads
         duration = FFmpegProxy.get_length(self.__input)
         print("duration", duration)
         self.__bitrate = FFmpegProxy.__calc_bitrate(args.file_size, duration, args.abr)
@@ -45,25 +46,22 @@ class FFmpegProxy:
             raise ModuleNotFoundError("Dependency 'ffprobe' was not found in your system PATH")
 
         """
-        {0} => -y if 'yes' was entered, otherwise empty string
-        {1} => input file path
-        {2} => video encoding library
-        {3} => output video average bitrate
-        {4} => audio encoding library
-        {5} => output audio average bitrate
-        {6} => output file path
+        {0} => threads to use for encoding, otherwise empty string
+        {1} => -y if 'yes' was entered, otherwise empty string
+        {2} => input file path
+        {3} => video encoding library
+        {4} => output video average bitrate
+        {5} => audio encoding library
+        {6} => output audio average bitrate
+        {7} => output file path
         """
-        fmt = "ffmepg {0}-i \"{1}\" -c:v {2} -b:v {3}k -pass 1 -an -f null /dev/null &&" \
-              " ffmpeg -i \"{1}\" -c:v {2} -b:v {3}k -pass 2 -c:a {4} -b:a {5}k \"{6}\""
+        fmt = "ffmepg{0} {1}-i \"{2}\" -c:v {3} -b:v {4}k -pass 1 -an -f null /dev/null &&" \
+              " ffmpeg{0} -i \"{2}\" -c:v {3} -b:v {4}k -pass 2 -c:a {5} -b:a {6}k \"{7}\""
         cmd = fmt.format(
-            "-y" if self.__yes else "",
-            self.__input,
-            self.__lib,
-            self.__bitrate,
-            self.__alib,
-            self.__abr,
-            self.__output)
-        print(cmd)
+            " -threads " + str(self.__threads) if self.__threads > 1 else "",  # hide if threads=1
+            "-y " if self.__yes else "", self.__input, self.__lib,
+            self.__bitrate, self.__alib, self.__abr, self.__output)
+        system(cmd)  # start ffmpeg through a system call
 
     @staticmethod
     def __calc_bitrate(file_size: int, file_duration: float, abr: int) -> int:
