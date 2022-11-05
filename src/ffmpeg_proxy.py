@@ -38,7 +38,6 @@ class FFmpegProxy:
         self.__abr = args.abr
         self.__threads = args.threads
         duration = FFmpegProxy.get_length(self.__input)
-        print("duration", duration)
         self.__bitrate = FFmpegProxy.__calc_bitrate(args.file_size, duration, args.abr)
 
     def encode(self) -> None:
@@ -55,7 +54,7 @@ class FFmpegProxy:
         {6} => output audio average bitrate
         {7} => output file path
         """
-        fmt = "ffmepg{0} {1}-i \"{2}\" -c:v {3} -b:v {4}k -pass 1 -an -f null /dev/null &&" \
+        fmt = "ffmpeg{0} {1}-i \"{2}\" -c:v {3} -b:v {4}k -pass 1 -an -f null /dev/null &&" \
               " ffmpeg{0} -i \"{2}\" -c:v {3} -b:v {4}k -pass 2 -c:a {5} -b:a {6}k \"{7}\""
         cmd = fmt.format(
             " -threads " + str(self.__threads) if self.__threads > 1 else "",  # hide if threads=1
@@ -74,9 +73,6 @@ class FFmpegProxy:
         :return: Bitrate of the file, in kBit/s
         """
         # 8388.608 -> Conversion from MiB to kBit
-        print("file size", file_size)
-        print("file_size * 8388.608", file_size * 8388.608)
-
         return int(file_size * 8388.608 / file_duration - abr)
 
     @staticmethod
