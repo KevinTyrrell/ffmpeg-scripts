@@ -22,6 +22,7 @@ from typing import Any
 from os.path import exists, isfile, getsize
 from argparse import Namespace
 from re import search
+from os import cpu_count
 
 
 class ArgWash:
@@ -43,14 +44,16 @@ class ArgWash:
         :param args: Arguments provided by argparse
         """
 
-        for washer in [
+        for washer in [  # Error check all user inputs
             ArgWash.__InputWasher(args, args.input),
             ArgWash.__FileSizeWasher(args, args.file_size),
             ArgWash.__OutputWasher(args, args.output),
+            ArgWash.__ABRWasher(args, args.abr),
+            ArgWash.__ThreadWasher(args, args.threads)
         ]:
             washer.wash()
 
-    class __ArgWasher:
+    class __ArgWasher:  # Interface
         def __init__(self, args: Namespace, value: Any):
             """
             Constructs a primitive Argument Washer, washing one particular instance variable
@@ -99,6 +102,20 @@ class ArgWash:
             match = search("(.+)[\\\\/].+\\..+", self._value)  # Split path from filename and check for ext
             return match is not None and exists(match.group(1))
 
+    class __ABRWasher(__ArgWasher):
+        def _get_exc(self) -> str:
+            return "Bitrate must be a positive integer"
 
+        def _wash(self) -> bool:
+            return self._value > 0
 
+    class __ThreadWasher(__ArgWasher):
+        def _get_exc(self) -> str:
+            return "Thread count must be positive and cannot exceed number of available CPU cores"
 
+        def _wash(self) -> bool:
+            cores = cpu_count()
+            if self._value == 0:  # Automatic mode: set to number of cores
+                self._args.threads = cores
+                return True
+            return 1 <= self._value <= cores
