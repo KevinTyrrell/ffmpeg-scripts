@@ -6,6 +6,7 @@ __pycache__/
 # IDE
 *.iml
 .idea/
+*.mbtree
 
 # C extensions
 *.so

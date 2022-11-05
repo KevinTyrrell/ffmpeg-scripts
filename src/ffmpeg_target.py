@@ -44,6 +44,9 @@ def main():
                       help="Number of threads to use for encoding, by default automatic to CPU core count")
     args.add_argument("-y", "--yes", dest="yes", action="store_true",
                       help="Proxy for ffmpeg -y, confirming yes to file overwriting")
+    args.add_argument("-p", "--preset", default="medium", help="Sets the speed preset for the encoding process",
+                      choices=["veryslow", "slower", "slow", "medium", "fast",
+                               "faster", "veryfast", "superfast", "ultrafast"])
     args = args.parse_args()
 
     wash = ArgWash(args)
