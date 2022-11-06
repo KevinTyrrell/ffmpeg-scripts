@@ -14,6 +14,11 @@ This is a repository for any scripts I write in order to make my life easier whe
 
 >###### Shorthand ffmpeg command for a two-pass encoding to target an approximate file size. Ideal for uploaded media which must meet tight file size constraints.
 
+* Example: You have a 45 MB video file `my_mov.mp4` and wish to upload it to a file sharing website with an `8.0` MB limit
+** **Command:** `. bin/ffmpeg-target.sh my_mov.mp4 7.95 my_smaller_mov.mp4`
+** This will take `my_mov.mp4` and re-encode it attempting to get it as close to `7.95` MB as possible. `7.95` instead of `8.0` as to not accidentally meet or exceed the constraint
+** See [Usage](#Usage) for more details on parameters
+
 ### Usage
 
 OS X & Linux:
