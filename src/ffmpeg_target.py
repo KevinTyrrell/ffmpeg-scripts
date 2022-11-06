@@ -30,20 +30,20 @@ def main():
                           epilog="Shorthand ffmpeg command for a two-pass encoding to target an approximate file "
                                  "size. Ideal for uploaded media which must meet tight file size constraints.")
     # Required arguments
-    args.add_argument("input", type=str, help="Absolute path to input media file to be re-encoded")
-    args.add_argument("file_size", type=float, help="Output file size target, in mega-bytes")
-    args.add_argument("output", type=str, help="File name/absolute file path of re-encoded file, including extension")
+    args.add_argument("input", type=str, help="Absolute file path to your input video file")
+    args.add_argument("file_size", type=float, help="Desired size of the output file, in megabytes")
+    args.add_argument("output", type=str, help="Absolute file path for your output video file")
     # Optional arguments
     args.add_argument("-l", "--lib", dest="lib", type=str, default="libx264",
-                      help="ffmpeg library to use for video encoding")
+                      help="Library to use for video encoding")
     args.add_argument("-a", "--alib", dest="alib", type=str, default="aac",
-                      help="ffmpeg library to use for audio encoding")
+                      help="Library to use for audio encoding")
     args.add_argument("-b", "--abr", dest="abr", type=int, default=128,
-                      help="Average desired audio bit-rate used for encoding, in kilobits per second")
+                      help="Average audio encoding bitrate, in kilobits per second")
     args.add_argument("-t", "--threads", dest="threads", type=int, choices=range(1, 64), default=0,  # '0' => automatic
-                      help="Number of threads to use for encoding, by default automatic to CPU core count")
+                      help="Number of worker threads for the encoding process (0 for auto-detect CPU cores)")
     args.add_argument("-y", "--yes", dest="yes", action="store_true",
-                      help="Proxy for ffmpeg -y, confirming yes to file overwriting")
+                      help="Overwrite output file if file already exists in the output path")
     args.add_argument("-p", "--preset", default="medium", help="Sets the speed preset for the encoding process",
                       choices=["veryslow", "slower", "slow", "medium", "fast",
                                "faster", "veryfast", "superfast", "ultrafast"])
