@@ -19,7 +19,7 @@
 from arg_wash import ArgWash
 
 import subprocess
-from distutils.spawn import find_executable
+from shutil import which
 from os import system
 from time import sleep
 
@@ -49,7 +49,7 @@ class FFmpegProxy:
         Encoding command is based on the formula provided in the FFmpeg docs:
         https://trac.ffmpeg.org/wiki/Encode/H.264#twopass
         """
-        if not find_executable("ffmpeg"):
+        if not which("ffmpeg"):
             raise ModuleNotFoundError("Dependency 'ffprobe' was not found in your system PATH")
 
         """
@@ -63,8 +63,11 @@ class FFmpegProxy:
         {7} => output audio average bitrate
         {8} => output file path
         """
+
+        # TODO: ffmpeg -hide_banner -i input.mp4 out.mp4 -y -f null - 2>&1 | grep --line-buffered '^frame='
+
         fmt = "ffmpeg{0} {1}-i \"{2}\" -c:v {3} -b:v {4}k -pass 1 -vsync cfr -f null /dev/null -preset {5} &&" \
-              " ffmpeg{0} -i \"{2}\" -c:v {3} -b:v {4}k -pass 2 -c:a {6} -b:a {7}k -preset {5} \"{8}\""
+              " ffmpeg{0} {1}-i \"{2}\" -c:v {3} -b:v {4}k -pass 2 -c:a {6} -b:a {7}k -preset {5} \"{8}\""
         cmd = fmt.format(
             " -threads " + str(self.__threads) if self.__threads > 1 else "",  # hide if threads=1
             "-y " if self.__yes else "", self.__input, self.__lib,
@@ -99,7 +102,7 @@ class FFmpegProxy:
         :param file_path: Path to a video file
         :return: Duration of a video file, in seconds
         """
-        if not find_executable("ffprobe"):
+        if not which("ffprobe"):
             raise ModuleNotFoundError("Dependency 'ffprobe' was not found in your system PATH")
         result = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration",
                                  "-of", "default=noprint_wrappers=1:nokey=1", file_path],

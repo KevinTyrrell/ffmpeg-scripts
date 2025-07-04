@@ -40,7 +40,7 @@ def main():
                       help="Library to use for audio encoding")
     args.add_argument("-b", "--abr", dest="abr", type=int, default=128,
                       help="Average audio encoding bitrate, in kilobits per second")
-    args.add_argument("-t", "--threads", dest="threads", type=int, choices=range(1, 64), default=0,  # '0' => automatic
+    args.add_argument("-t", "--threads", dest="threads", choices=range(0, 64), type=int, default=0,  # '0' => automatic
                       help="Number of worker threads for the encoding process (0 for auto-detect CPU cores)")
     args.add_argument("-y", "--yes", dest="yes", action="store_true",
                       help="Overwrite output file if file already exists in the output path")
