@@ -16,9 +16,19 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from __future__ import annotations
-from typing import Any, Optional
+from abc import ABC, abstractmethod
+from typing import Any
 
 
-class FfmpegBuilder(Buildable):
-    pass
+class Buildable(ABC):
+    @abstractmethod
+    def build(self) -> Any:
+        """
+        Builds the buildable object
+
+        This function should be non-terminating.
+        Each call results in a newly built object.
+
+        :return: Built object instance
+        """
+        pass

@@ -16,9 +16,27 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from __future__ import annotations
-from typing import Any, Optional
+import unittest
+
+from src.wrapper.input_builder import InputBuilder as Builder
 
 
-class FfmpegBuilder(Buildable):
-    pass
+class TestFfmpegInputWrapper(unittest.TestCase):
+    __TEST_PATH = "C:/users/admin/desktop/input.mp4"
+
+    def setUp(self):
+        self.builder = Builder(self.__TEST_PATH)
+
+    def test_input_1(self):
+        b: Builder = self.builder
+        b.seek(5)
+        self.assertEqual(b.build(), f"-ss 5 -i {self.__TEST_PATH}")
+
+    def test_input_2(self):
+        b: Builder = self.builder
+        b.loop().offset(10.2)
+        self.assertEqual(b.build(), f"-stream_loop  -itsoffset 10.2 -i {self.__TEST_PATH}")
+
+
+if __name__ == '__main__':
+    unittest.main()
